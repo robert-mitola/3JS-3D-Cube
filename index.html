@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>THREE JS CUBE</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+            #info {
+                padding-left: 10px;
+                color: white;
+                position: absolute;
+                top: 10px;
+                width: 100%;
+                text-align: left;
+                z-index: 100;
+                display:block;
+            }
+		</style>
+	</head>
+	<body>
+        <div id="info">TEST</div>
+    
+		<script src="js/three.js"></script>
+		<script>
+            var prevMouseX = 0, prevMouseY = 0, mouseX = 0, mouseY = 0, deltaTime=0;
+			var camera, scene, renderer, hemiLight, hemiLightHelper, cube, clock;
+            
+            init();
+            animate();
+            
+            function init(){
+                
+                // SETUP /////////////////////////////////////////////////////////////////////////////////////////
+                
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+                renderer = new THREE.WebGLRenderer({antialias:true});
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                document.body.appendChild(renderer.domElement);
+            
+                camera.position.z = 5;
+                
+                window.addEventListener('resize', onWindowResize, false);
+                document.onmousemove = function(event){
+                    prevMouseX = mouseX;
+                    prevMouseY = mouseY;
+                    mouseX = event.pageX;
+                    mouseY = event.pageY;
+                }
+            
+                clock = new THREE.Clock();
+            
+                // MESH //////////////////////////////////////////////////////////////////////////////////////////
+            
+                var geometry = new THREE.BoxGeometry(1,1,1);
+                var material = new THREE.MeshPhongMaterial({
+                    color: 0x00FFFF, 
+                    specular: 0xFFFFFF, 
+                    shininess: 100, 
+                    morphTargets: true, 
+                    vertexColors: THREE.FaceColors, 
+                    flatShading: true
+                });
+                
+                cube = new THREE.Mesh(geometry, material);
+                //cube.receiveShadow = true;
+                //cube.castShadow = true;
+                cube.rotation.x += .8; // rotates down
+                cube.rotation.y += .8; // rotates right
+                
+                scene.add(cube);
+            
+                // LIGHT /////////////////////////////////////////////////////////////////////////////////////////
+                hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFF, 1);
+                hemiLight.color.setHSL(180, 1, 1);
+                hemiLight.groundColor.setHSL(180, 1, .75);
+                hemiLight.position.set(0, 50, 0);
+                scene.add(hemiLight);
+                
+                hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
+                scene.add(hemiLightHelper);
+            }
+            
+            function onWindowResize(){
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+                
+            function animate(){
+                requestAnimationFrame(animate);
+                
+                deltaTime = clock.getDelta();
+                
+                document.getElementById("info").innerHTML = "Mouse Pos:      ("+mouseX+","+mouseY+")<br>" +
+                                                            "Prev Mouse Pos: ("+prevMouseX+","+prevMouseY+")<br>" +
+                                                            "Delta Time:      "+deltaTime;
+                //cube.rotation.x += 0.01; // rotates down
+                //cube.rotation.y += 0.01; // rotates right
+                
+                renderer.render(scene, camera);
+            }
+           
+		</script>
+	</body>
+</html>
